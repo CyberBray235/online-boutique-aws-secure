@@ -1,0 +1,71 @@
+Kezako monolithe en decouplé; Domain Driven Design; Event storming 
+
+Test en local du manifest kubernetes
+
+- Couche infrastructure : VPC, subnets publics/privés, NAT, IAM, EKS, ECR, Terraform.
+- Couche plateforme : Kubernetes, Argo CD, Ingress/ALB, Prometheus, Grafana, Alertmanager.
+- Couche sécurité : IAM least privilege, KMS, CloudTrail, AWS Config, GuardDuty EKS, scans d’images, logs d’audit.
+
+Le projet sera fait en deux phase:
+Phase 1 : déploiement fonctionnel de l’app sur EKS avec Terraform, Docker, ECR et GitHub Actions.
+Phase 2 : ajout de la partie différenciante, ArgoCD, Prometheus/Grafana, policy security, 
+scans de vulnérabilités, logs/audit AWS, documentation d’architecture et tests sécurité.
+
+Etape suivi le 18 Mars 
+Cree l'arborescence terraform avec les fichiers minimal
+creation des fichier providers; variable tfvars output main
+Etape du 19 Mars
+Creation des ressources (vpc,NAT,internet gateway)
+
+pour pratiquer terraform j'ai essayé et reussi à creer des ressources avec les modules
+module "ec2_instance" {
+  source = "terraform-aws-modules/ec2-instance/aws"
+  #version       = "~> 5.0"
+  name          = "${local.name_prefix}-test"
+  instance_type = "t3.micro"
+  key_name      = "test"
+  monitoring    = true
+  subnet_id     = module.vpc.public_subnets[0]
+  tags = {
+    Terraform   = "true"
+    environment = var.environment
+  }
+}
+
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+  #version       = "~> 6.0"
+  bucket = "${local.name_prefix}-braybucket"
+  #acl    = "private"
+  tags = {
+    Terraform   = "true"
+    environment = var.environment
+  }
+}
+et les output
+output "id_instance" {
+  value = module.ec2_instance.id
+}
+output "bucket" {
+  value = module.s3_bucket.s3_bucket_id
+}
+
+Etape du 21 Mars
+creation de ecr et ecrlifecycle via les ressources
+
+24 ùars 
+commande pour connecter aws au cluster : aws eks update-kubeconfig --region us-east-1 --name online-boutique-aws-dev-eks
+Creer un namespace pour controler les ressources : kubectl create namespace online-boutique
+Pour le deploiement de l'application : kubectl apply -n online-boutique -f ~/Documents/training/Projet_CloudDevops/microservices-demo/release/kubernetes-manifests.yaml
+
+Pour pousser les images sur le ecr on procede:
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 491243661002.dkr.ecr.us-east-1.amazonaws.com
+docker build : Le problème vient du fait que tu utilises le moteur de build "Legacy" (l'ancien moteur Docker), mais ton Dockerfile utilise des fonctionnalités modernes comme --platform=$BUILDPLATFORM, ARG TARGETOS, etc
+dire à kubernetes de chercher limage depuis ecr: kubectl set image deployment/frontend \
+  server=491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique:frontend-v1 \
+  -n online-boutique
+Pour ne plus faire du kubectl set image on va integrer kustomize
+
+Pour ce faire on cree des dossier
+mkdir -p ~/Documents/training/Projet_CloudDevops/online-boutique-aws-secure/k8s/base/frontend
+mkdir -p ~/Documents/training/Projet_CloudDevops/online-boutique-aws-secure/k8s/overlays/dev/frontend
