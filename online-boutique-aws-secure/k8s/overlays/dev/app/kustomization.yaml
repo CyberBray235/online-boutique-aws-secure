@@ -9,4 +9,4 @@ resources:
 images:
 - name: frontend
   newName: 491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique
-  newTag: frontend-01410680647e9530f63a44c14ac40f0ec72a7779
+  newTag: frontend-42477f1647adb52698f6a313ef318800a94c3b84
