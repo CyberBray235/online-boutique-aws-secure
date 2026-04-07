@@ -49,11 +49,13 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:frontend-latest
 
-      - name: Install Kustomize
-        run: |
-          curl -sSL https://github.com/kubernetes-sigs/kustomize/releases/latest/download/kustomize_linux_amd64 -o kustomize
-          chmod +x kustomize
-          sudo mv kustomize /usr/local/bin/kustomize
+      - name: Setup Kustomize
+        uses: syntaqx/setup-kustomize@v1
+        with:
+          kustomize-version: 5.4.2
+
+      - name: Check Kustomize version
+        run: kustomize version
 
       - name: Update Kustomize image tag
         env:
