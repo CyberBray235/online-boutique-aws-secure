@@ -59,9 +59,11 @@ jobs:
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           pwd
           ls -la
-          find . -maxdepth 5 -type d | sort
+          find . -maxdepth 6 -type d | sort
 
-      - name: Update Kustomize image tag
+      - name: Try update Kustomize image tag
+        id: update_kustomize
+        continue-on-error: true
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: frontend-${{ github.sha }}
@@ -70,7 +72,14 @@ jobs:
           kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           cat kustomization.yaml
 
+      - name: Fail if Kustomize path is wrong
+        if: steps.update_kustomize.outcome == 'failure'
+        run: |
+          echo "::error::Kustomize path not found. Check the Debug workspace output and update the cd path."
+          exit 1
+
       - name: Commit and push manifest update
+        if: steps.update_kustomize.outcome == 'success'
         env:
           IMAGE_TAG: frontend-${{ github.sha }}
         run: |
