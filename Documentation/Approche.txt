@@ -69,3 +69,23 @@ Pour ne plus faire du kubectl set image on va integrer kustomize
 Pour ce faire on cree des dossier
 mkdir -p ~/Documents/training/Projet_CloudDevops/online-boutique-aws-secure/k8s/base/frontend
 mkdir -p ~/Documents/training/Projet_CloudDevops/online-boutique-aws-secure/k8s/overlays/dev/frontend
+
+
+À retenir
+Après une destruction/recréation d’infra, il faut penser à vérifier deux choses :
+
+les ressources AWS ont bien été recréées ;
+
+les images custom dans ECR existent encore bien avec les tags attendus.
+
+Dans ton cas, la suite immédiate est donc : re-push de frontend-v1, puis restart du déploiement.
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 491243661002.dkr.ecr.us-east-1.amazonaws.com
+
+cd ~/Documents/training/Projet_CloudDevops/microservices-demo/src/frontend
+
+docker build -t online-boutique-frontend:v1 .
+docker tag online-boutique-frontend:v1 491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique:frontend-v1
+docker push 491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique:frontend-v1
+kubectl rollout restart deployment/frontend -n online-boutique
+kubectl rollout status deployment/frontend -n online-boutique
+kubectl get pods -n online-boutique

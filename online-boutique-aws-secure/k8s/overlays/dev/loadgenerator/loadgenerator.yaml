@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+  labels:
+    app: loadgenerator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgenerator
+  template:
+    metadata:
+      labels:
+        app: loadgenerator
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: main
+          image: us-central1-docker.pkg.dev/google-samples/microservices-demo/loadgenerator:v0.10.3
+          env:
+            - name: FRONTEND_ADDR
+              value: "frontend:80"
+            - name: USERS
+              value: "10"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
