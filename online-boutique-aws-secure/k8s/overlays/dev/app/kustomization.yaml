@@ -4,9 +4,9 @@ kind: Kustomization
 namespace: online-boutique
 
 resources:
-  - ../../../base
+- ../../../base
 
 images:
-  - name: frontend
-    newName: 491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique
-    newTag: frontend-v1
+- name: frontend
+  newName: 491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique
+  newTag: frontend-8d696c75536154f5b566851fa71e18959fddf456
