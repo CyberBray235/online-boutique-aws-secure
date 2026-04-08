@@ -1,5 +1,14 @@
 # Online Boutique AWS Secure
 
+This project is a cloud and DevOps implementation built around the open-source **Online Boutique** application from [GoogleCloudPlatform/microservices-demo](https://github.com/GoogleCloudPlatform/microservices-demo). The original application is a sample cloud-first microservices e-commerce app showcasing Kubernetes, gRPC, and distributed services.
+
+The application workload itself is not an original product developed from scratch in this repository. The main contribution of this project is the design and implementation of the surrounding platform: AWS infrastructure provisioning with Terraform, container image management with Amazon ECR, Kubernetes deployment on EKS, CI automation with GitHub Actions, GitOps delivery with Argo CD, and observability with Prometheus and Grafana.
+
+The goal of the project is to demonstrate how an existing open-source microservices application can be adapted, deployed, automated, observed, and hardened in a production-oriented AWS environment. Instead of focusing on business feature development, the emphasis is on platform engineering, deployment workflows, reliability, and operational visibility.
+
+> Note: this repository uses the open-source Online Boutique application as the application reference workload. The focus here is on the AWS, Kubernetes, CI/CD, GitOps, monitoring, and security implementation around that application.
+
+
 Projet **Cloud / DevOps** de bout en bout autour de l'application *Online Boutique* déployée sur Kubernetes avec une chaîne complète CI/CD, GitOps et observabilité. Le dépôt montre comment construire une image Docker, la publier dans Amazon ECR, mettre à jour les manifests Kustomize via GitHub Actions, puis laisser Argo CD synchroniser automatiquement ou manuellement l'état du cluster à partir de Git.
 
 ## Aperçu
@@ -165,6 +174,16 @@ Exemples de dashboards utiles :
 
 ### Monitoring
 ![Dashboard Grafana Kubernetes](/images/grafana.png)
+
+## Upstream project
+
+This project is based on the open-source **Online Boutique** sample application maintained by Google Cloud:
+
+- Upstream repository: [GoogleCloudPlatform/microservices-demo](https://github.com/GoogleCloudPlatform/microservices-demo) 
+- Project description: sample cloud-first application with 10 microservices showcasing Kubernetes, Istio, and gRPC 
+- Original license: see the upstream repository license 
+
+This repository extends that application with an AWS-focused platform implementation including Terraform, EKS, ECR, GitHub Actions, Argo CD, Prometheus, and Grafana.
 
 ## Licence
 BRAY MADOUE KAGONGBE
