@@ -1,91 +1,75 @@
-Kezako monolithe en decouplé; Domain Driven Design; Event storming 
+## Approach
 
-Test en local du manifest kubernetes
+Ce projet part d’un objectif simple : construire une plateforme Cloud/DevOps complète autour de l’application Online Boutique, en passant d’un simple déploiement Kubernetes à une plateforme plus mature intégrant GitOps, observabilité et sécurité. L’idée n’était pas seulement de faire tourner l’application, mais de montrer une progression vers une architecture plus propre, plus automatisée et plus exploitable.
 
-- Couche infrastructure : VPC, subnets publics/privés, NAT, IAM, EKS, ECR, Terraform.
-- Couche plateforme : Kubernetes, Argo CD, Ingress/ALB, Prometheus, Grafana, Alertmanager.
-- Couche sécurité : IAM least privilege, KMS, CloudTrail, AWS Config, GuardDuty EKS, scans d’images, logs d’audit.
+### Design principles
 
-Le projet sera fait en deux phase:
-Phase 1 : déploiement fonctionnel de l’app sur EKS avec Terraform, Docker, ECR et GitHub Actions.
-Phase 2 : ajout de la partie différenciante, ArgoCD, Prometheus/Grafana, policy security, 
-scans de vulnérabilités, logs/audit AWS, documentation d’architecture et tests sécurité.
+Plusieurs principes ont guidé l’approche du projet :
 
-Etape suivi le 18 Mars 
-Cree l'arborescence terraform avec les fichiers minimal
-creation des fichier providers; variable tfvars output main
-Etape du 19 Mars
-Creation des ressources (vpc,NAT,internet gateway)
+- Passage d’une logique applicative plus couplée vers une approche distribuée et mieux découpée.
+- Réflexion inspirée des concepts de Domain-Driven Design pour mieux comprendre les frontières fonctionnelles des services.
+- Utilisation d’une logique proche de l’Event Storming comme outil de réflexion pour comprendre les flux métier et les interactions entre composants.
+- Validation locale des manifests Kubernetes avant intégration dans la chaîne de déploiement.
+- Passage progressif d’un déploiement manuel à une approche déclarative avec Kustomize et GitOps.
 
-pour pratiquer terraform j'ai essayé et reussi à creer des ressources avec les modules
-module "ec2_instance" {
-  source = "terraform-aws-modules/ec2-instance/aws"
-  #version       = "~> 5.0"
-  name          = "${local.name_prefix}-test"
-  instance_type = "t3.micro"
-  key_name      = "test"
-  monitoring    = true
-  subnet_id     = module.vpc.public_subnets[0]
-  tags = {
-    Terraform   = "true"
-    environment = var.environment
-  }
-}
+### Architecture layers
 
-module "s3_bucket" {
-  source = "terraform-aws-modules/s3-bucket/aws"
-  #version       = "~> 6.0"
-  bucket = "${local.name_prefix}-braybucket"
-  #acl    = "private"
-  tags = {
-    Terraform   = "true"
-    environment = var.environment
-  }
-}
-et les output
-output "id_instance" {
-  value = module.ec2_instance.id
-}
-output "bucket" {
-  value = module.s3_bucket.s3_bucket_id
-}
+Le projet a été pensé en plusieurs couches complémentaires :
 
-Etape du 21 Mars
-creation de ecr et ecrlifecycle via les ressources
+- **Infrastructure layer**: VPC, subnets publics et privés, NAT Gateway, IAM, EKS, ECR, provisionnés avec Terraform.
+- **Platform layer**: Kubernetes, Argo CD, Ingress / ALB, Prometheus, Grafana et Alertmanager.
+- **Security layer**: IAM least privilege, KMS, CloudTrail, AWS Config, GuardDuty EKS, scans d’images, logs d’audit.
 
-24 ùars 
-commande pour connecter aws au cluster : aws eks update-kubeconfig --region us-east-1 --name online-boutique-aws-dev-eks
-Creer un namespace pour controler les ressources : kubectl create namespace online-boutique
-Pour le deploiement de l'application : kubectl apply -n online-boutique -f ~/Documents/training/Projet_CloudDevops/microservices-demo/release/kubernetes-manifests.yaml
+### Delivery phases
 
-Pour pousser les images sur le ecr on procede:
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 491243661002.dkr.ecr.us-east-1.amazonaws.com
-docker build : Le problème vient du fait que tu utilises le moteur de build "Legacy" (l'ancien moteur Docker), mais ton Dockerfile utilise des fonctionnalités modernes comme --platform=$BUILDPLATFORM, ARG TARGETOS, etc
-dire à kubernetes de chercher limage depuis ecr: kubectl set image deployment/frontend \
-  server=491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique:frontend-v1 \
-  -n online-boutique
-Pour ne plus faire du kubectl set image on va integrer kustomize
+Le projet a été structuré en deux phases principales :
 
-Pour ce faire on cree des dossier
-mkdir -p ~/Documents/training/Projet_CloudDevops/online-boutique-aws-secure/k8s/base/frontend
-mkdir -p ~/Documents/training/Projet_CloudDevops/online-boutique-aws-secure/k8s/overlays/dev/frontend
+#### Phase 1 — Functional deployment
 
+Cette première phase avait pour objectif de rendre l’application opérationnelle sur AWS avec une chaîne de déploiement fonctionnelle. Elle couvre Terraform pour l’infrastructure, Docker pour le build, Amazon ECR pour le registre, Kubernetes pour l’exécution, et GitHub Actions pour l’automatisation du build et du push des images.
 
-À retenir
-Après une destruction/recréation d’infra, il faut penser à vérifier deux choses :
+#### Phase 2 — Differentiation layer
 
-les ressources AWS ont bien été recréées ;
+La seconde phase a consisté à enrichir le projet avec des éléments plus avancés et plus différenciants pour un portfolio DevOps. Elle inclut Argo CD pour le GitOps, Prometheus et Grafana pour l’observabilité, des briques de sécurité, des scans de vulnérabilités, des logs et audits AWS, ainsi qu’une documentation d’architecture plus propre.
 
-les images custom dans ECR existent encore bien avec les tags attendus.
+### Implementation timeline
 
-Dans ton cas, la suite immédiate est donc : re-push de frontend-v1, puis restart du déploiement.
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 491243661002.dkr.ecr.us-east-1.amazonaws.com
+#### 18 March — Terraform project bootstrap
 
-cd ~/Documents/training/Projet_CloudDevops/microservices-demo/src/frontend
+- Création de l’arborescence Terraform avec les fichiers minimaux.
+- Mise en place des fichiers `providers.tf`, `variables.tf`, `terraform.tfvars`, `outputs.tf` et `main.tf`.
 
-docker build -t online-boutique-frontend:v1 .
-docker tag online-boutique-frontend:v1 491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique:frontend-v1
-docker push 491243661002.dkr.ecr.us-east-1.amazonaws.com/online-boutique-aws-dev-online_boutique:frontend-v1
-kubectl rollout restart deployment/frontend -n online-boutique
-kubectl rollout status deployment/frontend -n online-boutique
-kubectl get pods -n online-boutique
+#### 19 March — Networking foundation
+
+- Création des premières ressources réseau : VPC, NAT Gateway et Internet Gateway.
+
+#### Terraform practice with modules
+
+Pour consolider la pratique Terraform, des tests ont aussi été réalisés avec des modules communautaires afin de provisionner des ressources comme EC2 et S3, puis de récupérer leurs sorties avec des outputs.
+
+#### 21 March — Container registry
+
+- Création du registre Amazon ECR.
+- Mise en place des règles de cycle de vie des images.
+
+#### 24 March — Cluster access and first deployment
+
+- Connexion au cluster EKS avec `aws eks update-kubeconfig`.
+- Création du namespace `online-boutique`.
+- Déploiement initial de l’application avec les manifests Kubernetes du projet source.
+- Authentification Docker vers Amazon ECR.
+- Premier cycle de build, tag et push des images.
+
+### From manual deployment to GitOps
+
+Au début, certaines mises à jour d’images étaient faites manuellement avec `kubectl set image`, ce qui était utile pour débloquer rapidement les premiers tests. Ensuite, cette approche a été remplacée par Kustomize afin de versionner les changements de tag dans Git et d’éviter les mises à jour manuelles sur le cluster.
+
+Cette évolution a permis d’aligner le projet avec une logique GitOps plus propre : GitHub Actions met à jour les manifests, puis Argo CD réconcilie automatiquement ou manuellement l’état du cluster avec l’état déclaré dans Git.
+
+### Operational lessons learned
+
+Quelques points importants ont émergé pendant le projet :
+
+- Après une destruction et recréation de l’infrastructure, il faut vérifier que les ressources AWS ont bien été reconstruites.
+- Il faut aussi vérifier que les images custom existent toujours dans ECR avec les bons tags.
+- Si une image manque, la bonne séquence consiste à rebuild, re-tag, push l’image dans ECR, puis relancer le déploiement concerné.
