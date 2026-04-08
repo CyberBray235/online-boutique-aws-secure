@@ -106,7 +106,7 @@ Le monitoring du projet repose sur **Prometheus** et **Grafana**, déployés via
 
 Les principales sources de métriques utilisées sont :
 
-- **node-exporter**, pour les métriques système des nœuds, comme le CPU, la mémoire, le disque et le réseau.[web:919]
+- **node-exporter**, pour les métriques système des nœuds, comme le CPU, la mémoire, le disque et le réseau.
 - **kube-state-metrics**, pour les métriques liées à l’état des objets Kubernetes, comme les pods, les déploiements, les replicas et les redémarrages.
 - **métriques conteneurs et pods**, pour observer la consommation mémoire et CPU des workloads déployés dans le cluster.
 
@@ -178,8 +178,6 @@ Exemples de dashboards utiles :
 - Ajouter un environnement `staging` séparé avec un overlay Kustomize dédié.
 - Ajouter des alertes Grafana ou Alertmanager plus avancées sur les pods et les déploiements.
 - Instrumenter les microservices avec de vraies métriques applicatives Prometheus afin d'aller au-delà du monitoring infra/Kubernetes.
-- Ajouter des captures d'écran Grafana et Argo CD dans le dépôt pour renforcer la démonstration visuelle du projet.
-
 ## Démarrage rapide
 
 ```bash
