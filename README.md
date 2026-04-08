@@ -40,7 +40,7 @@ flowchart LR
 Cette architecture présente l’environnement AWS, le cluster EKS, la chaîne CI/CD avec GitHub Actions et Amazon ECR, le déploiement GitOps avec Argo CD, ainsi que la supervision via Prometheus et Grafana.
 
 <p align="center">
-  <img src="/images/project-architecture.jpg" alt="Architecture globale du projet Online Boutique AWS Secure" width="100%">
+  <img src="/images/project-architecture.png" alt="Architecture globale du projet Online Boutique AWS Secure" width="100%">
 </p>
 
 ## Flux CI/CD
