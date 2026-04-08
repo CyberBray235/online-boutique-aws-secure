@@ -35,6 +35,14 @@ flowchart LR
     Prom --> Graf[Grafana]
 ```
 
+## Architecture Devops
+
+Cette architecture présente l’environnement AWS, le cluster EKS, la chaîne CI/CD avec GitHub Actions et Amazon ECR, le déploiement GitOps avec Argo CD, ainsi que la supervision via Prometheus et Grafana.
+
+<p align="center">
+  <img src="/images/project-architecture.jpg" alt="Architecture globale du projet Online Boutique AWS Secure" width="100%">
+</p>
+
 ## Flux CI/CD
 
 Le pipeline suit une logique GitOps simple : un changement sur le frontend déclenche un build d'image, l'image est poussée dans ECR, puis le tag est injecté dans l'overlay Kustomize avant d'être poussé dans Git. Argo CD détecte alors ce nouveau commit et resynchronise l'application dans le cluster.
@@ -61,8 +69,7 @@ sequenceDiagram
 
 ## Observabilité
 
-La supervision repose sur Prometheus pour la collecte des métriques et Grafana pour leur visualisation. Cette combinaison est une pratique courante pour le monitoring Kubernetes et permet de suivre l'état des nœuds, des pods, des workloads et d'ajouter des alertes opérationnelles utiles.[cite:733][cite:739][cite:741]
-
+La supervision repose sur Prometheus pour la collecte des métriques et Grafana pour leur visualisation. Cette combinaison est une pratique courante pour le monitoring Kubernetes et permet de suivre l'état des nœuds, des pods, des workloads et d'ajouter des alertes opérationnelles utiles.
 ```mermaid
 flowchart LR
     K8s[Kubernetes Cluster] --> KSM[kube-state-metrics]
