@@ -156,7 +156,15 @@ Exemples de dashboards utiles :
 ```
 
 ## Captures à ajouter dans le repo
+### Argo CD
+![Application Argo CD synchronisée et healthy](/images/argocdsync.png)
+![Application Argo CD synchronisation auto](/images/argocd2.png)
 
+### Application
+![Interface Online Boutique déployée](/images/boutique.png)
+
+### Monitoring
+![Dashboard Grafana Kubernetes](/images/grafana.png)
 
 ## Licence
 BRAY MADOUE KAGONGBE
