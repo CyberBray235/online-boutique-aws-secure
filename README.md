@@ -15,6 +15,20 @@ Projet **Cloud / DevOps** de bout en bout autour de l'application *Online Boutiq
 
 Ce projet met en œuvre une architecture DevOps moderne autour de plusieurs briques complémentaires : AWS pour l'infrastructure et le registre d'images, Kubernetes pour l'orchestration, GitHub Actions pour la CI, Argo CD pour le GitOps, et Prometheus/Grafana pour la supervision.
 
+## Infrastructure as Code
+
+L’infrastructure AWS de ce projet est gérée avec **Terraform** afin de garantir un déploiement reproductible, versionné et maintenable.
+
+La couche Infrastructure as Code permet de provisionner et d’organiser les principales briques cloud utilisées par la plateforme :
+
+- VPC et composants réseau
+- Subnets publics et privés
+- Internet Gateway et NAT Gateway
+- Cluster Amazon EKS
+- Registres Amazon ECR
+
+L’utilisation de Terraform permet de limiter les changements manuels dans la console AWS, de réduire la dérive de configuration et d’aligner l’infrastructure avec une démarche DevOps pilotée par le code.
+
 ## Stack technique
 
 - AWS ECR, pour stocker les images Docker.
@@ -88,6 +102,25 @@ flowchart LR
     Prom --> Graf[Grafana Dashboards]
     Prom --> Alerts[Alert Rules]
 ```
+Le monitoring du projet repose sur **Prometheus** et **Grafana**, déployés via une stack de supervision Kubernetes. Dans l’état actuel du projet, les tableaux de bord s’appuient principalement sur des métriques d’infrastructure et des métriques natives Kubernetes, plutôt que sur des métriques applicatives personnalisées.
+
+Les principales sources de métriques utilisées sont :
+
+- **node-exporter**, pour les métriques système des nœuds, comme le CPU, la mémoire, le disque et le réseau.[web:919]
+- **kube-state-metrics**, pour les métriques liées à l’état des objets Kubernetes, comme les pods, les déploiements, les replicas et les redémarrages.
+- **métriques conteneurs et pods**, pour observer la consommation mémoire et CPU des workloads déployés dans le cluster.
+
+Exemples de métriques exploitées dans les dashboards ou les alertes :
+
+- `node_cpu_seconds_total`
+- `node_memory_MemAvailable_bytes`
+- `node_filesystem_size_bytes`
+- `kube_pod_container_status_restarts_total`
+- `kube_deployment_spec_replicas`
+- `kube_deployment_status_replicas_available`
+- `container_memory_working_set_bytes`
+
+Ces métriques permettent de suivre la santé des nœuds, le comportement des pods, la disponibilité des déploiements, la fréquence des redémarrages ainsi que la consommation des ressources du cluster.
 
 ## Structure du dépôt
 
